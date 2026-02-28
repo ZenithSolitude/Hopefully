@@ -1,0 +1,21 @@
+{{define "logs.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "title"}}Логи — Hopefully{{end}}
+{{define "page-title"}}Системные логи{{end}}
+
+{{define "topbar-actions"}}
+  <button class="btn" onclick="document.getElementById('log-pre').scrollTop=9999999">&#8595; В конец</button>
+  <a href="/logs?lines=500" class="btn">500 строк</a>
+{{end}}
+
+{{define "content"}}
+<div class="card" style="height:calc(100vh - 160px);display:flex;flex-direction:column">
+  <div class="card-body" style="flex:1;overflow:hidden;padding:0">
+    <pre id="log-pre" class="log-view">{{range .Lines}}{{.}}
+{{end}}</pre>
+  </div>
+</div>
+<script>document.getElementById('log-pre').scrollTop=999999</script>
+{{end}}

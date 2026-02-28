@@ -1,0 +1,15 @@
+{{define "module_offline.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "title"}}Модуль недоступен — Hopefully{{end}}
+{{define "page-title"}}Модуль{{end}}
+
+{{define "content"}}
+<div class="empty-state">
+  <div style="font-size:3rem">&#128268;</div>
+  <h3>Модуль недоступен</h3>
+  <p>Модуль не активен или не найден</p>
+  <a href="/modules" class="btn">&#8592; К модулям</a>
+</div>
+{{end}}

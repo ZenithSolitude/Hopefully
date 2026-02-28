@@ -1,0 +1,84 @@
+{{define "users.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "title"}}Пользователи — Hopefully{{end}}
+{{define "page-title"}}Пользователи{{end}}
+
+{{define "topbar-actions"}}
+  {{if .CurrentUser.IsAdmin}}
+  <button class="btn btn-primary" onclick="showModal('modal-user')">+ Добавить</button>
+  {{end}}
+{{end}}
+
+{{define "content"}}
+<div class="card">
+  <div class="card-body">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Имя пользователя</th>
+          <th>Полное имя</th>
+          <th>Email</th>
+          <th>Роль</th>
+          <th>Статус</th>
+          <th>Создан</th>
+          {{if .CurrentUser.IsAdmin}}<th>Действия</th>{{end}}
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Users}}
+        <tr>
+          <td><strong>{{.Username}}</strong></td>
+          <td>{{.FullName}}</td>
+          <td>{{.Email}}</td>
+          <td>{{if .IsAdmin}}<span class="badge badge-admin">admin</span>{{else}}<span class="badge">user</span>{{end}}</td>
+          <td><span class="status {{if .IsActive}}status-active{{else}}status-inactive{{end}}">{{if .IsActive}}активен{{else}}отключён{{end}}</span></td>
+          <td>{{.CreatedAt}}</td>
+          {{if $.CurrentUser.IsAdmin}}
+          <td class="actions">
+            <button class="btn btn-sm {{if .IsActive}}btn-warning{{else}}btn-success{{end}}"
+              hx-post="/users/{{.ID}}/toggle"
+              hx-target="body">
+              {{if .IsActive}}Откл.{{else}}Вкл.{{end}}
+            </button>
+            <button class="btn btn-sm btn-danger"
+              hx-delete="/users/{{.ID}}"
+              hx-confirm="Удалить пользователя {{.Username}}?"
+              hx-target="body">Удалить</button>
+          </td>
+          {{end}}
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{{if .CurrentUser.IsAdmin}}
+<div id="modal-user" class="modal" style="display:none">
+  <div class="modal-backdrop" onclick="hideModal('modal-user')"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>Новый пользователь</h2>
+      <button onclick="hideModal('modal-user')" class="modal-close">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div id="user-form-error"></div>
+      <form hx-post="/users" hx-target="#user-form-error" hx-swap="innerHTML">
+        <div class="field"><label>Логин *</label><input type="text" name="username" required></div>
+        <div class="field"><label>Пароль *</label><input type="password" name="password" required></div>
+        <div class="field"><label>Полное имя</label><input type="text" name="full_name"></div>
+        <div class="field"><label>Email</label><input type="email" name="email"></div>
+        <div class="field">
+          <label>
+            <input type="checkbox" name="is_admin" value="1"> Администратор
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary">Создать</button>
+      </form>
+    </div>
+  </div>
+</div>
+{{end}}
+{{end}}

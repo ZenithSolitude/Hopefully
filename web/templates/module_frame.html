@@ -1,0 +1,21 @@
+{{define "module_frame.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "title"}}{{.ModuleName}} — Hopefully{{end}}
+{{define "page-title"}}{{.ModuleName}}{{end}}
+
+{{define "content"}}
+{{if .Error}}
+<div class="empty-state">
+  <div style="font-size:3rem">&#128268;</div>
+  <h3>Модуль недоступен</h3>
+  <p>{{.Error}}</p>
+  <a href="/modules" class="btn">&#8592; К модулям</a>
+</div>
+{{else}}
+<div class="module-frame-wrap">
+  <iframe src="/module-proxy/{{.ModuleName}}/" class="module-iframe" frameborder="0"></iframe>
+</div>
+{{end}}
+{{end}}

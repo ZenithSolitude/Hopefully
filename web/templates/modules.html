@@ -1,0 +1,129 @@
+{{define "modules.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "title"}}Модули — Hopefully{{end}}
+{{define "page-title"}}Модули{{end}}
+
+{{define "topbar-actions"}}
+  {{if .CurrentUser.IsAdmin}}
+  <button class="btn btn-primary" onclick="showModal('modal-install')">+ Установить модуль</button>
+  {{end}}
+{{end}}
+
+{{define "content"}}
+<div class="card">
+  <div class="card-body">
+  {{if not .Modules}}
+    <div class="empty-state">
+      <div style="font-size:3rem">&#129513;</div>
+      <h3>Модулей пока нет</h3>
+      <p>Установите первый модуль, нажав кнопку выше</p>
+    </div>
+  {{else}}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Имя</th>
+          <th>Версия</th>
+          <th>Описание</th>
+          <th>Автор</th>
+          <th>Источник</th>
+          <th>Статус</th>
+          {{if .CurrentUser.IsAdmin}}<th>Действия</th>{{end}}
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Modules}}
+        <tr>
+          <td><strong>{{.Name}}</strong></td>
+          <td><code>{{.Version}}</code></td>
+          <td>{{.Description}}</td>
+          <td>{{.Author}}</td>
+          <td><span class="badge badge-{{.SourceType}}">{{.SourceType}}</span></td>
+          <td>
+            <span class="status status-{{.Status}}">{{.Status}}</span>
+            {{if .ErrorLog}}<span class="error-hint" title="{{.ErrorLog}}">⚠</span>{{end}}
+          </td>
+          {{if $.CurrentUser.IsAdmin}}
+          <td class="actions">
+            {{if eq .Status "active"}}
+              <button class="btn btn-sm btn-warning"
+                hx-post="/modules/{{.Name}}/deactivate"
+                hx-confirm="Деактивировать модуль {{.Name}}?"
+                hx-target="body" hx-push-url="false">Стоп</button>
+            {{else}}
+              <button class="btn btn-sm btn-success"
+                hx-post="/modules/{{.Name}}/activate"
+                hx-target="body" hx-push-url="false">Старт</button>
+            {{end}}
+            <a href="/modules/{{.Name}}" class="btn btn-sm">Открыть</a>
+            <button class="btn btn-sm btn-danger"
+              hx-delete="/modules/{{.Name}}"
+              hx-confirm="Удалить модуль {{.Name}}? Это действие необратимо."
+              hx-target="body">Удалить</button>
+          </td>
+          {{end}}
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  {{end}}
+  </div>
+</div>
+
+{{if .CurrentUser.IsAdmin}}
+<!-- Модальное окно установки -->
+<div id="modal-install" class="modal" style="display:none">
+  <div class="modal-backdrop" onclick="hideModal('modal-install')"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>Установка модуля</h2>
+      <button onclick="hideModal('modal-install')" class="modal-close">&#10005;</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(this,'tab-github')">GitHub / Git URL</button>
+        <button class="tab" onclick="switchTab(this,'tab-zip')">ZIP-архив</button>
+      </div>
+
+      <!-- GitHub tab -->
+      <div id="tab-github" class="tab-panel">
+        <form hx-post="/modules/install/github"
+              hx-target="#install-log-wrap"
+              hx-swap="innerHTML"
+              hx-indicator="#install-spinner">
+          <div class="field">
+            <label>URL репозитория</label>
+            <input type="url" name="url" placeholder="https://github.com/user/my-module" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Установить</button>
+          <span id="install-spinner" class="htmx-indicator spinner">&#9696;</span>
+        </form>
+      </div>
+
+      <!-- ZIP tab -->
+      <div id="tab-zip" class="tab-panel" style="display:none">
+        <form hx-post="/modules/install/zip"
+              hx-encoding="multipart/form-data"
+              hx-target="#install-log-wrap"
+              hx-swap="innerHTML"
+              hx-indicator="#install-spinner2">
+          <div class="field">
+            <label>ZIP-файл модуля</label>
+            <input type="file" name="file" accept=".zip" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Установить</button>
+          <span id="install-spinner2" class="htmx-indicator spinner">&#9696;</span>
+        </form>
+      </div>
+
+      <!-- Лог установки -->
+      <div id="install-log-wrap" class="install-log-wrap"></div>
+
+    </div>
+  </div>
+</div>
+{{end}}
+{{end}}

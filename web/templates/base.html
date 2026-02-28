@@ -1,0 +1,67 @@
+{{define "base"}}<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{block "title" .}}Hopefully{{end}}</title>
+  <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="/dashboard" class="logo">
+      <span class="logo-icon">🌱</span>
+      <span class="logo-text">Hopefully</span>
+    </a>
+    <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('collapsed')">&#9776;</button>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-section">
+      <span class="nav-label">Система</span>
+      <a href="/dashboard" class="nav-item {{if hasPrefix .CurrentPath "/dashboard"}}active{{end}}"><span class="nav-icon">&#128202;</span><span class="nav-text">Дашборд</span></a>
+      <a href="/modules"   class="nav-item {{if hasPrefix .CurrentPath "/modules"}}active{{end}}"><span class="nav-icon">&#129513;</span><span class="nav-text">Модули</span></a>
+      <a href="/users"     class="nav-item {{if hasPrefix .CurrentPath "/users"}}active{{end}}"><span class="nav-icon">&#128101;</span><span class="nav-text">Пользователи</span></a>
+      <a href="/logs"      class="nav-item {{if hasPrefix .CurrentPath "/logs"}}active{{end}}"><span class="nav-icon">&#128203;</span><span class="nav-text">Логи</span></a>
+    </div>
+
+    {{$items := navItems}}
+    {{if $items}}
+    <div class="nav-section">
+      <span class="nav-label">Модули</span>
+      {{range $items}}
+      <a href="{{.Href}}" class="nav-item {{if hasPrefix $.CurrentPath .Href}}active{{end}}">
+        <span class="nav-icon">{{.Icon}}</span>
+        <span class="nav-text">{{.Label}}</span>
+      </a>
+      {{end}}
+    </div>
+    {{end}}
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <span class="user-icon">&#128100;</span>
+      <span class="user-name">{{.CurrentUser.DisplayName}}</span>
+    </div>
+    <a href="/logout" class="btn-logout" title="Выйти">&#9167;</a>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <h1 class="page-title">{{block "page-title" .}}{{end}}</h1>
+    <div class="topbar-actions">{{block "topbar-actions" .}}{{end}}</div>
+  </header>
+  <div class="content">
+    {{block "content" .}}{{end}}
+  </div>
+</main>
+
+<div id="toast-container"></div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>{{end}}

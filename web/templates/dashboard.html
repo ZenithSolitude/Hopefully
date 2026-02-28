@@ -1,0 +1,69 @@
+{{define "dashboard.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "title"}}Дашборд — Hopefully{{end}}
+{{define "page-title"}}Дашборд{{end}}
+
+{{define "content"}}
+<div class="stats-grid"
+     hx-ext="sse"
+     sse-connect="/dashboard/metrics"
+     sse-swap="message"
+     hx-target="#metrics-data"
+     hx-swap="outerHTML">
+
+  <div id="metrics-data" class="stats-grid-inner">
+    {{template "metrics-cards" .Metrics}}
+  </div>
+</div>
+
+<div class="cards-row">
+  <div class="card">
+    <div class="card-header">
+      <h3>Системная информация</h3>
+    </div>
+    <div class="card-body">
+      <table class="info-table">
+        <tr><td>Аптайм</td><td id="uptime">{{.Metrics.Uptime}}</td></tr>
+        <tr><td>Load Average</td><td id="loadavg">{{.Metrics.LoadAvg}}</td></tr>
+        <tr><td>Версия</td><td>Hopefully {{.Version}}</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>Быстрые действия</h3></div>
+    <div class="card-body quick-actions">
+      <a href="/modules" class="quick-btn">&#129513; Модули</a>
+      <a href="/users"   class="quick-btn">&#128101; Пользователи</a>
+      <a href="/logs"    class="quick-btn">&#128203; Логи</a>
+    </div>
+  </div>
+</div>
+{{end}}
+
+{{define "metrics-cards"}}
+<div id="metrics-data" class="stats-grid-inner">
+  <div class="stat-card">
+    <div class="stat-label">CPU</div>
+    <div class="stat-value">{{.CPUStr}}%</div>
+    <div class="stat-bar"><div class="stat-bar-fill" style="width:{{.CPUStr}}%"></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Память</div>
+    <div class="stat-value">{{.MemUsedStr}} / {{.MemTotalStr}}</div>
+    <div class="stat-bar"><div class="stat-bar-fill" style="width:{{.MemPctStr}}%"></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Диск</div>
+    <div class="stat-value">{{.DiskUsedStr}} / {{.DiskTotalStr}}</div>
+    <div class="stat-bar"><div class="stat-bar-fill" style="width:{{.DiskPctStr}}%"></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Аптайм</div>
+    <div class="stat-value" id="uptime">{{.Uptime}}</div>
+    <div class="stat-sub">Load: {{.LoadAvg}}</div>
+  </div>
+</div>
+{{end}}
